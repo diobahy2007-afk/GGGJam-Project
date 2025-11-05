@@ -1,3 +1,38 @@
-[gd_scene format=3 uid="uid://cdwd5vsqnk5nl"]
+[gd_scene load_steps=6 format=3 uid="uid://cdwd5vsqnk5nl"]
 
-[node name="Node2D" type="Node2D"]
+[ext_resource type="PackedScene" uid="uid://85h4bodi3kdg" path="res://Scene/Player.tscn" id="1_lax48"]
+[ext_resource type="PackedScene" uid="uid://c8nuyutlswcx2" path="res://Scene/Enemies.tscn" id="2_6ihgc"]
+[ext_resource type="Script" uid="uid://bf4y3htjqynuv" path="res://scripts/game_manager.gd" id="3_oeblo"]
+[ext_resource type="Script" uid="uid://r4461fqv841u" path="res://Scene/dynamic_cam.gd" id="4_bi33i"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kx7ml"]
+size = Vector2(1837, 204)
+
+[node name="Main" type="Node2D"]
+script = ExtResource("3_oeblo")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+script = ExtResource("4_bi33i")
+normal_zoom = Vector2(1.4, 1.4)
+standoff_zoom = Vector2(2, 2)
+
+[node name="Player" parent="." groups=["player"] instance=ExtResource("1_lax48")]
+position = Vector2(-276, 105)
+
+[node name="Enemy1" parent="." groups=["enemies"] instance=ExtResource("2_6ihgc")]
+position = Vector2(111, 104)
+
+[node name="Enemy2" parent="." groups=["enemies"] instance=ExtResource("2_6ihgc")]
+position = Vector2(438, 105)
+
+[node name="Ground" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
+position = Vector2(2, 222)
+shape = SubResource("RectangleShape2D_kx7ml")
+
+[node name="TimingWindowTimer" type="Timer" parent="."]
+
+[node name="StandOffTimer" type="Timer" parent="."]
+
+[node name="ResultTimer" type="Timer" parent="."]
