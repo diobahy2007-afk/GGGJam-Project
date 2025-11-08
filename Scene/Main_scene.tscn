@@ -1,3 +1,152 @@
-[gd_scene format=3 uid="uid://cdwd5vsqnk5nl"]
+[gd_scene load_steps=11 format=3 uid="uid://cdwd5vsqnk5nl"]
 
-[node name="Node2D" type="Node2D"]
+[ext_resource type="PackedScene" uid="uid://85h4bodi3kdg" path="res://Scene/Player.tscn" id="1_lax48"]
+[ext_resource type="PackedScene" uid="uid://c8nuyutlswcx2" path="res://Scene/Enemies.tscn" id="2_6ihgc"]
+[ext_resource type="Script" uid="uid://bf4y3htjqynuv" path="res://scripts/game_manager.gd" id="3_oeblo"]
+[ext_resource type="Script" uid="uid://r4461fqv841u" path="res://scripts/dynamic_cam.gd" id="4_bi33i"]
+[ext_resource type="Script" uid="uid://cff77fv33flsg" path="res://scripts/cinematic_bars.gd" id="5_g3qbw"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kx7ml"]
+size = Vector2(1837, 204)
+
+[sub_resource type="Animation" id="Animation_1ifoh"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BottBar:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 648)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("TopBar:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, -175)]
+}
+
+[sub_resource type="Animation" id="Animation_uoa8u"]
+resource_name = "hide_bars"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TopBar:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, -175)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BottBar:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 473), Vector2(0, 648)]
+}
+
+[sub_resource type="Animation" id="Animation_yn178"]
+resource_name = "show_bars"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("BottBar:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 648), Vector2(0, 473)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("TopBar:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, -175), Vector2(0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_w1tng"]
+_data = {
+&"RESET": SubResource("Animation_1ifoh"),
+&"hide_bars": SubResource("Animation_uoa8u"),
+&"show_bars": SubResource("Animation_yn178")
+}
+
+[node name="Main" type="Node2D"]
+script = ExtResource("3_oeblo")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+script = ExtResource("4_bi33i")
+normal_zoom = Vector2(1.4, 1.4)
+standoff_zoom = Vector2(2, 2)
+
+[node name="Player" parent="." groups=["player"] instance=ExtResource("1_lax48")]
+position = Vector2(-276, 105)
+
+[node name="Enemy1" parent="." groups=["enemies"] instance=ExtResource("2_6ihgc")]
+position = Vector2(111, 104)
+
+[node name="Enemy2" parent="." groups=["enemies"] instance=ExtResource("2_6ihgc")]
+position = Vector2(438, 105)
+
+[node name="Ground" type="StaticBody2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
+position = Vector2(2, 222)
+shape = SubResource("RectangleShape2D_kx7ml")
+
+[node name="TimingWindowTimer" type="Timer" parent="."]
+
+[node name="StandOffTimer" type="Timer" parent="."]
+
+[node name="ResultTimer" type="Timer" parent="."]
+
+[node name="CinematicBars" type="CanvasLayer" parent="."]
+script = ExtResource("5_g3qbw")
+
+[node name="TopBar" type="ColorRect" parent="CinematicBars"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = -175.0
+grow_horizontal = 2
+color = Color(0, 0, 0, 1)
+
+[node name="BottBar" type="ColorRect" parent="CinematicBars"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = 175.0
+grow_horizontal = 2
+grow_vertical = 0
+color = Color(0, 0, 0, 1)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="CinematicBars"]
+libraries = {
+&"": SubResource("AnimationLibrary_w1tng")
+}
