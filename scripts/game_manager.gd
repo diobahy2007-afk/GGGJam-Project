@@ -2,10 +2,12 @@ extends Node2D
 
 enum GameState { APPROACH, STAND_OFF, TIMING_WINDOW, RESULT, GAME_OVER }
 # kelola state buat playernya
+
 var current_state = GameState.APPROACH
 var current_enemy = null
 var enemies = []
 var current_enemy_index = 0
+
 
 @onready var player = $Player
 @onready var camera = $Camera2D
@@ -15,10 +17,13 @@ var current_enemy_index = 0
 @onready var cinematic_bars = $CinematicBars
 
 const STANDOFF_DURATION := 1.2
+
 const TIMING_WINDOW_DURATION := 0.5
 const RESULT_DELAY := 0.7
 
 func _ready() -> void:
+	# Connect timer signals
+
 	standoff_timer.timeout.connect(_on_stand_off_timer_timeout)
 	timing_timer.timeout.connect(_on_timing_window_timer_timeout)
 	result_timer.timeout.connect(_on_result_timer_timeout)
@@ -31,6 +36,15 @@ func setup_enemies():
 	
 	if enemies.size() > 0:
 		current_enemy = enemies[current_enemy_index] #
+
+	enemies = get_tree().get_nodes_in_group("enemies")
+	
+	if enemies.size() > 0:
+		current_enemy = enemies[current_enemy_index]
+		print("Total enemies: ", enemies.size())
+	else:
+		push_error("No enemies found in group 'enemies'!")
+
 
 func start_approach():
 	current_state = GameState.APPROACH
@@ -52,12 +66,10 @@ func start_stand_off():
 	player.play_stand_off_animation()
 	if current_enemy:
 		current_enemy.play_stand_off_animation()
-	
-	if camera and camera.has_method("enter_standoff"):
-		camera.enter_standoff(current_enemy)
 		
 	cinematic_bars.show_bars()
 	# Mulai timer untuk telegraph
+	camera.enter_standoff(current_enemy)
 	standoff_timer.start(STANDOFF_DURATION)
 
 # Timer stand off selesai - enemy mulai telegraph
@@ -137,7 +149,7 @@ func handle_failed_attack():
 	await get_tree().create_timer(2.0).timeout
 	restart_game()
 
-
+# Result timer timeout - lanjut ke enemy berikutnya
 func _on_result_timer_timeout():
 	if current_state != GameState.RESULT:
 		return
@@ -156,11 +168,17 @@ func _on_result_timer_timeout():
 	else:	
 		stage_complete()
 
-func stage_complete():
-	current_state = GameState.GAME_OVER 
 
-	await get_tree().create_timer(3.0).timeout
-	restart_game() #placeholder sblm membuat UI finish
+func stage_complete():
+	current_state = GameState.GAME_OVER  # Reuse state untuk stage complete
 	
+	# Tunggu sebentar lalu next stage/restart
+	await get_tree().create_timer(3.0).timeout
+	next_stage()
+
+func next_stage():
+	# Bisa load stage baru atau restart
+	get_tree().reload_current_scene()
+
 func restart_game():
 	get_tree().reload_current_scene()

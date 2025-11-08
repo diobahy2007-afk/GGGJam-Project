@@ -1,6 +1,7 @@
 extends CharacterBody2D
 
 const SPEED = 200.0
+
 var is_walking  = false
 var target_position = Vector2.ZERO
 var can_attack = false
