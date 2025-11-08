@@ -50,6 +50,14 @@ func play_defeated_animation():
 # Dipanggil saat enemy menyerang (player gagal)
 func play_attack_animation():
 	animated_sprite.play("Attack")
+	if animated_sprite:
+		if animated_sprite.sprite_frames.has_animation("Attack"):
+			animated_sprite.play("Attack")
+		else:
+			# Fallback ke animasi lain jika Attack tidak ada
+			animated_sprite.play("Idle")
+	
+	print(name, " attacking player")
 
 # ========================================
 # TELEGRAPH LOGIC (CUE UNTUK PLAYER)
@@ -80,6 +88,15 @@ func show_telegraph():
 		# Normal
 		tween_flash.tween_property(animated_sprite, "modulate", Color(1.0, 1.0, 1.0), 0.1).set_delay(0.1)
 	
+	# === VISUAL EFFECT 3: Rotation Shake (Opsional) ===
+	# Uncomment jika ingin efek shake
+	# if animated_sprite:
+	# 	var tween_shake = create_tween()
+	# 	tween_shake.tween_property(animated_sprite, "rotation_degrees", 10, 0.05)
+	# 	tween_shake.tween_property(animated_sprite, "rotation_degrees", -10, 0.05)
+	# 	tween_shake.tween_property(animated_sprite, "rotation_degrees", 0, 0.05)
+	
+
 	# === AUDIO CUE ===
 	# Jika ada AudioStreamPlayer untuk sound effect
 	if has_node("TelegraphSound"):
